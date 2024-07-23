@@ -1,5 +1,12 @@
- 
-                                                                                                                                                                                                                                                                                                                                                         
+
+
+
+
+
+
+
+
+
 local Arsenalhaxx = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local RGB = Instance.new("Frame")
@@ -336,34 +343,25 @@ Duration = 15;
 })
 wait(2)
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "LOADED";
-Text = "UNIVERSAL AIMBOT AND ESP RAREZZ GITHUB";
+Title = "UNIVERSAL ESP AND AIMBOT";
+Text = "LOADED";
 Duration = 15;
 })
 wait(2)
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "CHEATER]";
+Title = "CHEATER";
 Text = "CHEATER";
 Duration = 15;
 })
-wait(0)
+wait(2)
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "CHEATER]";
+Title = "CHEATER";
 Text = "CHEATER";
 Duration = 15;
 })
-wait(0)
+wait(2)
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "CHEATER]";
+Title = "RAREZZ GITHUB";
 Text = "CHEATER";
 Duration = 15;
 })
-wait(0)
-game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "CHEATER]";
-Text = "CHEATER";
-Duration = 15;
-})
-
-
-
