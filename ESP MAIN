@@ -1,10 +1,19 @@
 
 
+
+
+
+
+
+
+
 local Arsenalhaxx = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local RGB = Instance.new("Frame")
 local MainTitle = Instance.new("TextLabel")
 local ESP = Instance.new("TextButton")
+local Aimbot = Instance.new("TextButton")
+local fly = Instance.new("TextButton")
 
 
 Arsenalhaxx.Name = "Arsenalhaxx"
@@ -53,6 +62,347 @@ ESP.MouseButton1Click:connect(function()
 -- WALLHACK
 end)
 
+Aimbot.Name = "Aimbot"
+Aimbot.Parent = MainFrame
+Aimbot.BackgroundColor3 = Color3.new(1, 1, 1)
+Aimbot.BackgroundTransparency = 1
+Aimbot.Position = UDim2.new(0, 0, 0.282178223, 0)
+Aimbot.Size = UDim2.new(0, 269, 0, 22)
+Aimbot.Font = Enum.Font.SourceSansBold
+Aimbot.Text = "SEXY AIMBOT [E]"
+Aimbot.TextColor3 = Color3.new(1, 1, 1)
+Aimbot.TextSize = 14
+Aimbot.MouseButton1Click:connect(function()
+	 --// Cache
+
+local select = select
+local pcall, getgenv, next, Vector2, mathclamp, type, mousemoverel = select(1, pcall, getgenv, next, Vector2.new, math.clamp, type, mousemoverel or (Input and Input.MouseMove))
+
+--// Preventing Multiple Processes
+
+pcall(function()
+	getgenv().Aimbot.Functions:Exit()
+end)
+
+--// Environment
+
+getgenv().Aimbot = {}
+local Environment = getgenv().Aimbot
+
+--// Services
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+--// Variables
+
+local RequiredDistance, Typing, Running, Animation, ServiceConnections = 2000, false, false, nil, {}
+
+--// Script Settings
+
+Environment.Settings = {
+	Enabled = true,
+	TeamCheck = false,
+	AliveCheck = true,
+	WallCheck = false, -- Laggy
+	Sensitivity = 0, -- Animation length (in seconds) before fully locking onto target
+	ThirdPerson = false, -- Uses mousemoverel instead of CFrame to support locking in third person (could be choppy)
+	ThirdPersonSensitivity = 3, -- Boundary: 0.1 - 5
+	TriggerKey = "MouseButton2",
+	Toggle = false,
+	LockPart = "Head" -- Body part to lock on
+}
+
+Environment.FOVSettings = {
+	Enabled = true,
+	Visible = true,
+	Amount = 200,
+	Color = Color3.fromRGB(255, 255, 255),
+	LockedColor = Color3.fromRGB(255, 70, 70),
+	Transparency = 0.5,
+	Sides = 60,
+	Thickness = 1,
+	Filled = false
+}
+
+Environment.FOVCircle = Drawing.new("Circle")
+
+--// Functions
+
+local function CancelLock()
+	Environment.Locked = nil
+	if Animation then Animation:Cancel() end
+	Environment.FOVCircle.Color = Environment.FOVSettings.Color
+end
+
+local function GetClosestPlayer()
+	if not Environment.Locked then
+		RequiredDistance = (Environment.FOVSettings.Enabled and Environment.FOVSettings.Amount or 2000)
+
+		for _, v in next, Players:GetPlayers() do
+			if v ~= LocalPlayer then
+				if v.Character and v.Character:FindFirstChild(Environment.Settings.LockPart) and v.Character:FindFirstChildOfClass("Humanoid") then
+					if Environment.Settings.TeamCheck and v.Team == LocalPlayer.Team then continue end
+					if Environment.Settings.AliveCheck and v.Character:FindFirstChildOfClass("Humanoid").Health <= 0 then continue end
+					if Environment.Settings.WallCheck and #(Camera:GetPartsObscuringTarget({v.Character[Environment.Settings.LockPart].Position}, v.Character:GetDescendants())) > 0 then continue end
+
+					local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character[Environment.Settings.LockPart].Position)
+					local Distance = (Vector2(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y) - Vector2(Vector.X, Vector.Y)).Magnitude
+
+					if Distance < RequiredDistance and OnScreen then
+						RequiredDistance = Distance
+						Environment.Locked = v
+					end
+				end
+			end
+		end
+	elseif (Vector2(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y) - Vector2(Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position).X, Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position).Y)).Magnitude > RequiredDistance then
+		CancelLock()
+	end
+end
+
+--// Typing Check
+
+ServiceConnections.TypingStartedConnection = UserInputService.TextBoxFocused:Connect(function()
+	Typing = true
+end)
+
+ServiceConnections.TypingEndedConnection = UserInputService.TextBoxFocusReleased:Connect(function()
+	Typing = false
+end)
+
+--// Main
+
+local function Load()
+	ServiceConnections.RenderSteppedConnection = RunService.RenderStepped:Connect(function()
+		if Environment.FOVSettings.Enabled and Environment.Settings.Enabled then
+			Environment.FOVCircle.Radius = Environment.FOVSettings.Amount
+			Environment.FOVCircle.Thickness = Environment.FOVSettings.Thickness
+			Environment.FOVCircle.Filled = Environment.FOVSettings.Filled
+			Environment.FOVCircle.NumSides = Environment.FOVSettings.Sides
+			Environment.FOVCircle.Color = Environment.FOVSettings.Color
+			Environment.FOVCircle.Transparency = Environment.FOVSettings.Transparency
+			Environment.FOVCircle.Visible = Environment.FOVSettings.Visible
+			Environment.FOVCircle.Position = Vector2(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+		else
+			Environment.FOVCircle.Visible = false
+		end
+
+		if Running and Environment.Settings.Enabled then
+			GetClosestPlayer()
+
+			if Environment.Locked then
+				if Environment.Settings.ThirdPerson then
+					Environment.Settings.ThirdPersonSensitivity = mathclamp(Environment.Settings.ThirdPersonSensitivity, 0.1, 5)
+
+					local Vector = Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position)
+					mousemoverel((Vector.X - UserInputService:GetMouseLocation().X) * Environment.Settings.ThirdPersonSensitivity, (Vector.Y - UserInputService:GetMouseLocation().Y) * Environment.Settings.ThirdPersonSensitivity)
+				else
+					if Environment.Settings.Sensitivity > 0 then
+						Animation = TweenService:Create(Camera, TweenInfo.new(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFrame.new(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)})
+						Animation:Play()
+					else
+						Camera.CFrame = CFrame.new(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)
+					end
+				end
+
+			Environment.FOVCircle.Color = Environment.FOVSettings.LockedColor
+
+			end
+		end
+	end)
+
+	ServiceConnections.InputBeganConnection = UserInputService.InputBegan:Connect(function(Input)
+		if not Typing then
+			pcall(function()
+				if Input.KeyCode == Enum.KeyCode[Environment.Settings.TriggerKey] then
+					if Environment.Settings.Toggle then
+						Running = not Running
+
+						if not Running then
+							CancelLock()
+						end
+					else
+						Running = true
+					end
+				end
+			end)
+
+			pcall(function()
+				if Input.UserInputType == Enum.UserInputType[Environment.Settings.TriggerKey] then
+					if Environment.Settings.Toggle then
+						Running = not Running
+
+						if not Running then
+							CancelLock()
+						end
+					else
+						Running = true
+					end
+				end
+			end)
+		end
+	end)
+
+	ServiceConnections.InputEndedConnection = UserInputService.InputEnded:Connect(function(Input)
+		if not Typing then
+			if not Environment.Settings.Toggle then
+				pcall(function()
+					if Input.KeyCode == Enum.KeyCode[Environment.Settings.TriggerKey] then
+						Running = false; CancelLock()
+					end
+				end)
+
+				pcall(function()
+					if Input.UserInputType == Enum.UserInputType[Environment.Settings.TriggerKey] then
+						Running = false; CancelLock()
+					end
+				end)
+			end
+		end
+	end)
+end
+
+--// Functions
+
+Environment.Functions = {}
+
+function Environment.Functions:Exit()
+	for _, v in next, ServiceConnections do
+		v:Disconnect()
+	end
+
+	if Environment.FOVCircle.Remove then Environment.FOVCircle:Remove() end
+
+	getgenv().Aimbot.Functions = nil
+	getgenv().Aimbot = nil
+	
+	Load = nil; GetClosestPlayer = nil; CancelLock = nil
+end
+
+function Environment.Functions:Restart()
+	for _, v in next, ServiceConnections do
+		v:Disconnect()
+	end
+
+	Load()
+end
+
+function Environment.Functions:ResetSettings()
+	Environment.Settings = {
+		Enabled = true,
+		TeamCheck = false,
+		AliveCheck = true,
+		WallCheck = false,
+		Sensitivity = 0, -- Animation length (in seconds) before fully locking onto target
+		ThirdPerson = false, -- Uses mousemoverel instead of CFrame to support locking in third person (could be choppy)
+		ThirdPersonSensitivity = 3, -- Boundary: 0.1 - 5
+		TriggerKey = "MouseButton2",
+		Toggle = false,
+		LockPart = "Head" -- Body part to lock on
+	}
+
+	Environment.FOVSettings = {
+		Enabled = true,
+		Visible = true,
+		Amount = 90,
+		Color = Color3.fromRGB(255, 255, 255),
+		LockedColor = Color3.fromRGB(255, 70, 70),
+		Transparency = 0.5,
+		Sides = 60,
+		Thickness = 1,
+		Filled = false
+	}
+end
+
+--// Load
+
+Load()
+ 
+game:GetService('RunService').RenderStepped:connect(function()
+    if ENABLED then
+        local TARGET = GetNearestPlayerToMouse()
+        if (TARGET ~= false) then
+            local AIM = TARGET.Character:FindFirstChild(_G.AIM_AT)
+            if AIM then
+                CC.CoordinateFrame = CFrame.new(CC.CoordinateFrame.p, AIM.CFrame.p)
+            end
+        end
+    end
+end) -- AIMBOT [E]
+end)
+
+fly.Name = "fly"
+fly.Parent = MainFrame
+fly.BackgroundColor3 = Color3.new(1, 1, 1)
+fly.BackgroundTransparency = 1
+fly.Position = UDim2.new(0, 0, 0.391089112, 0)
+fly.Size = UDim2.new(0, 269, 0, 22)
+fly.Font = Enum.Font.SourceSansBold
+fly.Text = "FLY [V]"
+fly.TextColor3 = Color3.new(1, 1, 1)
+fly.TextSize = 14
+fly.MouseButton1Click:connect(function()
+	repeat wait()until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("UpperTorso")and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")local y=game.Players.LocalPlayer:GetMouse()repeat wait()until y;local z=game.Players.LocalPlayer;local L=z.Character.UpperTorso;local M=true;local N=true;local O={f=0,b=0,l=0,r=0}local P={f=0,b=0,l=0,r=0}local Q=50;local H=0;function Fly()local R=Instance.new("BodyGyro",L)R.P=9e4;R.maxTorque=Vector3.new(9e9,9e9,9e9)R.cframe=L.CFrame;local S=Instance.new("BodyVelocity",L)S.velocity=Vector3.new(0,0.1,0)S.maxForce=Vector3.new(9e9,9e9,9e9)repeat wait()z.Character.Humanoid.PlatformStand=true;if O.l+O.r~=0 or O.f+O.b~=0 then H=H+.5+H/Q;if H>Q then H=Q end elseif not(O.l+O.r~=0 or O.f+O.b~=0)and H~=0 then H=H-1;if H<0 then H=0 end end;if O.l+O.r~=0 or O.f+O.b~=0 then S.velocity=(game.Workspace.CurrentCamera.CoordinateFrame.lookVector*(O.f+O.b)+game.Workspace.CurrentCamera.CoordinateFrame*CFrame.new(O.l+O.r,(O.f+O.b)*.2,0).p-game.Workspace.CurrentCamera.CoordinateFrame.p)*H;P={f=O.f,b=O.b,l=O.l,r=O.r}elseif O.l+O.r==0 and O.f+O.b==0 and H~=0 then S.velocity=(game.Workspace.CurrentCamera.CoordinateFrame.lookVector*(P.f+P.b)+game.Workspace.CurrentCamera.CoordinateFrame*CFrame.new(P.l+P.r,(P.f+P.b)*.2,0).p-game.Workspace.CurrentCamera.CoordinateFrame.p)*H else S.velocity=Vector3.new(0,0.1,0)end;R.cframe=game.Workspace.CurrentCamera.CoordinateFrame*CFrame.Angles(-math.rad((O.f+O.b)*50*H/Q),0,0)until not M;O={f=0,b=0,l=0,r=0}P={f=0,b=0,l=0,r=0}H=0;R:Destroy()S:Destroy()z.Character.Humanoid.PlatformStand=false end;y.KeyDown:connect(function(G)if G:lower()=="v"then if M then M=false else M=true;Fly()end elseif G:lower()=="w"then O.f=1 elseif G:lower()=="s"then O.b=-1 elseif G:lower()=="a"then O.l=-1 elseif G:lower()=="d"then O.r=1 end end)y.KeyUp:connect(function(G)if G:lower()=="w"then O.f=0 elseif G:lower()=="s"then O.b=0 elseif G:lower()=="a"then O.l=0 elseif G:lower()=="d"then O.r=0 end end)Fly()
+end)
+ctrldel.Name = "ctrldel"
+ctrldel.Parent = MainFrame
+ctrldel.BackgroundColor3 = Color3.new(1, 1, 1)
+ctrldel.BackgroundTransparency = 1
+ctrldel.Position = UDim2.new(0, 0, 0.5, 0)
+ctrldel.Size = UDim2.new(0, 269, 0, 22)
+ctrldel.Font = Enum.Font.SourceSansBold
+ctrldel.Text = "CTRL DELETE"
+ctrldel.TextColor3 = Color3.new(1, 1, 1)
+ctrldel.TextSize = 14
+ctrldel.MouseButton1Click:connect(function()
+	local Plr = game:GetService("Players").LocalPlayer -- CTRL NO WALLS
+local Mouse = Plr:GetMouse()
+
+Mouse.Button1Down:connect(function()
+if not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then return end
+if not Mouse.Target then return end
+Mouse.Target:Destroy()
+end)
+end)
+
+destrust.Name = "destrust"
+destrust.Parent = MainFrame
+destrust.BackgroundColor3 = Color3.new(1, 1, 1)
+destrust.BackgroundTransparency = 1
+destrust.Position = UDim2.new(0, 0, 0.608910918, 0)
+destrust.Size = UDim2.new(0, 269, 0, 22)
+destrust.Font = Enum.Font.SourceSansBold
+destrust.Text = "SELF DESTRUCT"
+destrust.TextColor3 = Color3.new(1, 1, 1)
+destrust.TextSize = 14
+destrust.MouseButton1Click:connect(function()
+	Arsenalhaxx:Destroy()
+end)
+
+function SCRIPT_JZPL83_FAKESCRIPT() -- Xs2.LocalScript 
+	local script = Instance.new('LocalScript')
+	script.Parent = RGB
+	repeat
+	    for hue = 0, 1, .01 do
+	        script.Parent.Parent.RGB.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+	        wait(0.3)
+	    end
+	    for hue = 1, 0 -.01 do
+	        script.Parent.Parent.RGB.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+	        wait(0.3)
+	    end
+	until nil
+
+end
+coroutine.resume(coroutine.create(SCRIPT_JZPL83_FAKESCRIPT))
+
+
+
 game:GetService("StarterGui"):SetCore("SendNotification", {
 Title = "SEXY BABY ESP";
 Text = "Loaded.";
@@ -60,7 +410,20 @@ Duration = 15;
 })
 wait(2)
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "UNIVERSAL ESP JACOB AND TYLER]";
-Text = "Crafted Sexy";
+Title = "UNIVERSAL ESP JACOB AND TYLER BBL LATINA ESP]";
+Text = "Crafted Sexy Niggassss";
 Duration = 15;
+})
+wait(2)
+print(scriptname .. " " .. ver .. " loaded successfully")
+print("made by Vigdom")
+
+local notifSound = Instance.new("Sound",workspace)
+notifSound.PlaybackSpeed = 1.00
+notifSound.Volume = 10
+notifSound.SoundId = "rbxassetid://5600184020"
+notifSound.PlayOnRemove = true
+notifSound:Destroy()
+game.StarterGui:SetCore("SendNotification", {Title = "Tyler Cheat Hub", Text = "Tyler's Cheat Hub Loaded Successfully!", Icon = "rbxassetid://505845268", Duration = 5, Button1 = "<OK"})
+
 })
