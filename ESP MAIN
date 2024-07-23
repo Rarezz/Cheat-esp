@@ -13,7 +13,6 @@ local RGB = Instance.new("Frame")
 local MainTitle = Instance.new("TextLabel")
 local ESP = Instance.new("TextButton")
 local Aimbot = Instance.new("TextButton")
-local fly = Instance.new("TextButton")
 
 
 Arsenalhaxx.Name = "Arsenalhaxx"
@@ -336,94 +335,42 @@ game:GetService('RunService').RenderStepped:connect(function()
 end) -- AIMBOT [E]
 end)
 
-fly.Name = "fly"
-fly.Parent = MainFrame
-fly.BackgroundColor3 = Color3.new(1, 1, 1)
-fly.BackgroundTransparency = 1
-fly.Position = UDim2.new(0, 0, 0.391089112, 0)
-fly.Size = UDim2.new(0, 269, 0, 22)
-fly.Font = Enum.Font.SourceSansBold
-fly.Text = "FLY [V]"
-fly.TextColor3 = Color3.new(1, 1, 1)
-fly.TextSize = 14
-fly.MouseButton1Click:connect(function()
-	repeat wait()until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("UpperTorso")and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")local y=game.Players.LocalPlayer:GetMouse()repeat wait()until y;local z=game.Players.LocalPlayer;local L=z.Character.UpperTorso;local M=true;local N=true;local O={f=0,b=0,l=0,r=0}local P={f=0,b=0,l=0,r=0}local Q=50;local H=0;function Fly()local R=Instance.new("BodyGyro",L)R.P=9e4;R.maxTorque=Vector3.new(9e9,9e9,9e9)R.cframe=L.CFrame;local S=Instance.new("BodyVelocity",L)S.velocity=Vector3.new(0,0.1,0)S.maxForce=Vector3.new(9e9,9e9,9e9)repeat wait()z.Character.Humanoid.PlatformStand=true;if O.l+O.r~=0 or O.f+O.b~=0 then H=H+.5+H/Q;if H>Q then H=Q end elseif not(O.l+O.r~=0 or O.f+O.b~=0)and H~=0 then H=H-1;if H<0 then H=0 end end;if O.l+O.r~=0 or O.f+O.b~=0 then S.velocity=(game.Workspace.CurrentCamera.CoordinateFrame.lookVector*(O.f+O.b)+game.Workspace.CurrentCamera.CoordinateFrame*CFrame.new(O.l+O.r,(O.f+O.b)*.2,0).p-game.Workspace.CurrentCamera.CoordinateFrame.p)*H;P={f=O.f,b=O.b,l=O.l,r=O.r}elseif O.l+O.r==0 and O.f+O.b==0 and H~=0 then S.velocity=(game.Workspace.CurrentCamera.CoordinateFrame.lookVector*(P.f+P.b)+game.Workspace.CurrentCamera.CoordinateFrame*CFrame.new(P.l+P.r,(P.f+P.b)*.2,0).p-game.Workspace.CurrentCamera.CoordinateFrame.p)*H else S.velocity=Vector3.new(0,0.1,0)end;R.cframe=game.Workspace.CurrentCamera.CoordinateFrame*CFrame.Angles(-math.rad((O.f+O.b)*50*H/Q),0,0)until not M;O={f=0,b=0,l=0,r=0}P={f=0,b=0,l=0,r=0}H=0;R:Destroy()S:Destroy()z.Character.Humanoid.PlatformStand=false end;y.KeyDown:connect(function(G)if G:lower()=="v"then if M then M=false else M=true;Fly()end elseif G:lower()=="w"then O.f=1 elseif G:lower()=="s"then O.b=-1 elseif G:lower()=="a"then O.l=-1 elseif G:lower()=="d"then O.r=1 end end)y.KeyUp:connect(function(G)if G:lower()=="w"then O.f=0 elseif G:lower()=="s"then O.b=0 elseif G:lower()=="a"then O.l=0 elseif G:lower()=="d"then O.r=0 end end)Fly()
-end)
-ctrldel.Name = "ctrldel"
-ctrldel.Parent = MainFrame
-ctrldel.BackgroundColor3 = Color3.new(1, 1, 1)
-ctrldel.BackgroundTransparency = 1
-ctrldel.Position = UDim2.new(0, 0, 0.5, 0)
-ctrldel.Size = UDim2.new(0, 269, 0, 22)
-ctrldel.Font = Enum.Font.SourceSansBold
-ctrldel.Text = "CTRL DELETE"
-ctrldel.TextColor3 = Color3.new(1, 1, 1)
-ctrldel.TextSize = 14
-ctrldel.MouseButton1Click:connect(function()
-	local Plr = game:GetService("Players").LocalPlayer -- CTRL NO WALLS
-local Mouse = Plr:GetMouse()
-
-Mouse.Button1Down:connect(function()
-if not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then return end
-if not Mouse.Target then return end
-Mouse.Target:Destroy()
-end)
-end)
-
-destrust.Name = "destrust"
-destrust.Parent = MainFrame
-destrust.BackgroundColor3 = Color3.new(1, 1, 1)
-destrust.BackgroundTransparency = 1
-destrust.Position = UDim2.new(0, 0, 0.608910918, 0)
-destrust.Size = UDim2.new(0, 269, 0, 22)
-destrust.Font = Enum.Font.SourceSansBold
-destrust.Text = "SELF DESTRUCT"
-destrust.TextColor3 = Color3.new(1, 1, 1)
-destrust.TextSize = 14
-destrust.MouseButton1Click:connect(function()
-	Arsenalhaxx:Destroy()
-end)
-
-function SCRIPT_JZPL83_FAKESCRIPT() -- Xs2.LocalScript 
-	local script = Instance.new('LocalScript')
-	script.Parent = RGB
-	repeat
-	    for hue = 0, 1, .01 do
-	        script.Parent.Parent.RGB.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
-	        wait(0.3)
-	    end
-	    for hue = 1, 0 -.01 do
-	        script.Parent.Parent.RGB.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
-	        wait(0.3)
-	    end
-	until nil
-
-end
-coroutine.resume(coroutine.create(SCRIPT_JZPL83_FAKESCRIPT))
-
-
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "SEXY BABY ESP";
+Title = "SEXY ESP";
 Text = "Loaded.";
 Duration = 15;
 })
 wait(2)
 game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "UNIVERSAL ESP JACOB AND TYLER BBL LATINA ESP]";
-Text = "Crafted Sexy Niggassss";
+Title = "LOADED";
+Text = "UNIVERSAL AIMBOT AND ESP RAREZZ GITHUB";
 Duration = 15;
 })
 wait(2)
-print(scriptname .. " " .. ver .. " loaded successfully")
-print("made by Vigdom")
-
-local notifSound = Instance.new("Sound",workspace)
-notifSound.PlaybackSpeed = 1.00
-notifSound.Volume = 10
-notifSound.SoundId = "rbxassetid://5600184020"
-notifSound.PlayOnRemove = true
-notifSound:Destroy()
-game.StarterGui:SetCore("SendNotification", {Title = "Tyler Cheat Hub", Text = "Tyler's Cheat Hub Loaded Successfully!", Icon = "rbxassetid://505845268", Duration = 5, Button1 = "<OK"})
-
+game:GetService("StarterGui"):SetCore("SendNotification", {
+Title = "CHEATER]";
+Text = "CHEATER";
+Duration = 15;
 })
+wait(0)
+game:GetService("StarterGui"):SetCore("SendNotification", {
+Title = "CHEATER]";
+Text = "CHEATER";
+Duration = 15;
+})
+wait(0)
+game:GetService("StarterGui"):SetCore("SendNotification", {
+Title = "CHEATER]";
+Text = "CHEATER";
+Duration = 15;
+})
+wait(0)
+game:GetService("StarterGui"):SetCore("SendNotification", {
+Title = "CHEATER]";
+Text = "CHEATER";
+Duration = 15;
+})
+
+
+
