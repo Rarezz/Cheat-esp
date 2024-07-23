@@ -334,34 +334,17 @@ game:GetService('RunService').RenderStepped:connect(function()
     end
 end) -- AIMBOT [E]
 end)
-
+local notifSound = Instance.new("Sound",workspace)
+notifSound.PlaybackSpeed = 1.00
+notifSound.Volume = 10
+notifSound.SoundId = "rbxassetid://5600184020"
+notifSound.PlayOnRemove = true
+notifSound:Destroy()
+game.StarterGui:SetCore("SendNotification", {Title = "AIMBOT&ESP", Text = "RAREZZ GITHUB Loaded Successfully!", Icon = "rbxassetid://505845268", Duration = 5, Button1 = "<OK>"})
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
 Title = "SEXY ESP";
-Text = "Loaded.";
+Text = "RAREZZ GITHUB.";
 Duration = 15;
 })
-wait(2)
-game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "UNIVERSAL ESP AND AIMBOT";
-Text = "LOADED";
-Duration = 15;
-})
-wait(2)
-game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "CHEATER";
-Text = "CHEATER";
-Duration = 15;
-})
-wait(2)
-game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "CHEATER";
-Text = "CHEATER";
-Duration = 15;
-})
-wait(2)
-game:GetService("StarterGui"):SetCore("SendNotification", {
-Title = "RAREZZ GITHUB";
-Text = "CHEATER";
-Duration = 15;
-})
+
